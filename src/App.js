@@ -1,24 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import MainLayout from "./layout/MainLayout";
+import { BrowserRouter, useLocation } from "react-router-dom";
+import AppRoutes from "./app/routes";
+import { ThemeProvider } from "@mui/material";
+import theme from "./ui/theme/theme";
+
+function AppContent() {
+  const location = useLocation();
+  const isUnprotectedRoute = location.pathname === "/login";
+
+  return (
+    <ThemeProvider theme={theme}>
+      {isUnprotectedRoute ? (
+        <AppRoutes />
+      ) : (
+        <MainLayout>
+          <AppRoutes />
+        </MainLayout>
+      )}
+    </ThemeProvider>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 
