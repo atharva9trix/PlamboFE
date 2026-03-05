@@ -34,7 +34,7 @@ export default function ToolsGridView({
         <Box
           sx={{
             mt: 0.5,
-            pl: 70,
+            pl: 62,
             pr: 4,
             flexShrink: 0,
             display: "flex",
