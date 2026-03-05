@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "../../../app/providers/AppProvider";
 import AppAlert from "../../../ui/components/AppAlert";
 import { createSession } from "../../../core/services/appService";
 
 export default function ModeButtons({ hideBrief = false }) {
-  const { selectedClient, sendQuery, setActiveMode, setSessionId } = useApp();
+  const { selectedClient, setActiveMode, setSessionId, activeMode } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,19 +22,17 @@ export default function ModeButtons({ hideBrief = false }) {
 
   const path = location.pathname;
 
-  const modeMap = {
-    "/": ["Analyze", "Brief", "Generate", "Audience", "Activate"],
-    "/analyze": ["Home", "Generate", "Audience", "Activate"],
-    "/generate": ["Home", "Analyze", "Audience", "Activate"],
-    "/audience": ["Home", "Analyze", "Generate", "Activate"],
-    "/activate": ["Home", "Analyze", "Generate", "Audience"],
-    "/brief": ["Analyze", "Generate", "Audience", "Activate"],
-  };
 
   let modes =
-    modeMap[path] || ["Home", "Analyze", "Generate", "Audience", "Activate"];
+    ["Brief", "Analyze", "Generate", "Audience", "Activate"];
 
-  
+ 
+  useEffect(() => {
+    if (activeMode && !modes.includes(activeMode)) {
+      modes = [activeMode, ...modes];
+    }
+  }, [activeMode, path]);
+
   if (hideBrief) {
     modes = modes.filter((m) => m !== "Brief");
   }
@@ -92,6 +90,18 @@ export default function ModeButtons({ hideBrief = false }) {
     }
   };
 
+ 
+  const getActiveMode = () => {
+    if (path.includes("analyze")) return "Analyze";
+    if (path.includes("brief")) return "Brief";
+    if (path.includes("generate")) return "Generate";
+    if (path.includes("audience")) return "Audience";
+    if (path.includes("activate")) return "Activate";
+    return null;
+  };
+
+  const currentActive = getActiveMode();
+
   return (
     <>
       <Box
@@ -103,30 +113,44 @@ export default function ModeButtons({ hideBrief = false }) {
           mt: 1,
         }}
       >
-        {modes.map((m) => (
-          <Box
-            key={m}
-            onClick={() => handleAction(m)}
-            sx={{
-              px: 3.2,
-              py: 1.1,
-              borderRadius: "24px",
-              background:
-                "linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.1))",
-              color: "white",
-              cursor: "pointer",
-              backdropFilter: "blur(6px)",
-              transition: "all 0.2s ease",
-              "&:hover": {
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15))",
-                transform: "translateY(-2px)",
-              },
-            }}
-          >
-            {m}
-          </Box>
-        ))}
+        {modes.map((m) => {
+          const isActive = m === currentActive;
+
+          return (
+            <Box
+              key={m}
+              onClick={() => handleAction(m)}
+              sx={{
+                px: 3.2,
+                py: 1.1,
+                borderRadius: "24px",
+                cursor: "pointer",
+                backdropFilter: "blur(6px)",
+                transition: "all 0.2s ease",
+
+                
+                background: isActive
+                  ? "linear-gradient(135deg, #ffffff, #d3d3d3)"
+                  : "linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.1))",
+
+                color: isActive ? "#000" : "white",
+                fontWeight: isActive ? "700" : "400",
+                boxShadow: isActive
+                  ? "0 0 10px rgba(255,255,255,0.6)"
+                  : "none",
+
+                "&:hover": {
+                  background: isActive
+                    ? "linear-gradient(135deg, #ffffff, #d3d3d3)"
+                    : "linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15))",
+                  transform: "translateY(-2px)",
+                },
+              }}
+            >
+              {m}
+            </Box>
+          );
+        })}
       </Box>
 
       <AppAlert

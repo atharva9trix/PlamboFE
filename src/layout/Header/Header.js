@@ -10,6 +10,7 @@ import CreateEntityModal from "../../ui/components/EntityModal";
 
 export default function Header() {
   const {
+    goHome,
     clients = [],
     selectedClient,
     setSelectedClient,
@@ -42,7 +43,7 @@ export default function Header() {
     if (loading) {
       showAlert(
         "Please Wait",
-        "Wait while the response is generating before switching clients.",
+        "Wait while the response is generating before switching clients."
       );
       return;
     }
@@ -79,13 +80,20 @@ export default function Header() {
             gap: 2,
           }}
         >
+    
           <Box
             sx={{
               mt: -1,
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
+              cursor: "pointer",
+              transition: "0.2s ease",
+              "&:hover": {
+                opacity: 0.85,
+              },
             }}
+          onClick={() => goHome(navigate)}
           >
             <img src={logo} alt="logo" width="74" />
             <Typography
@@ -96,6 +104,7 @@ export default function Header() {
                 fontWeight: 500,
                 lineHeight: 1.15,
                 color: "#fff",
+                userSelect: "none",
               }}
             >
               Performance
@@ -240,6 +249,7 @@ export default function Header() {
         onSubmit={handleCreateClient}
         loading={loading}
       />
+
       <CreateEntityModal
         open={projectModalOpen}
         onClose={() => setProjectModalOpen(false)}

@@ -203,7 +203,7 @@ export default function AnalyzePage() {
         sx={{
           width: 200,
           p: 3,
-          pt: 51,
+          pt: 55,
           display: "flex",
           flexDirection: "column",
           background: "transparent",

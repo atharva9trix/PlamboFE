@@ -63,8 +63,10 @@ export default function QueryInput() {
           sx={{
             "& textarea": {
               padding: "10px 0px",
-              color: "rgba(255,255,255,0.7)",
-              fontSize: 14,
+              color: "rgba(255,255,255,0.85)",
+              fontSize: 15,
+              fontFamily: "'Poppins', sans-serif !important", 
+              letterSpacing: "0.2px",
             },
           }}
         />

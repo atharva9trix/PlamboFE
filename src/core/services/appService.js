@@ -2,6 +2,7 @@ import axios from "./http/axiosInstance";
 
 const ENDPOINTS = {
   QUERY: "/query",
+  QUERY_STREAM: "/query_stream",
   CLIENTS: "/clients",
   HEALTH: "/health",
   CREATE_SESSION: "/create_session", 
@@ -274,3 +275,30 @@ export async function generateImage(clientId, prompt) {
 }
 
 
+export async function streamQuery(clientId, query, opts = {}, onChunk) {
+  const payload = {
+    client_id: { Client_Name: clientId },
+    query: String(query).trim(),
+    conversation_context: opts.conversation_context || "",
+  };
+
+  const response = await fetch(axios.defaults.baseURL + ENDPOINTS.QUERY_STREAM, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) throw new Error("Streaming failed");
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let fullText = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    fullText += chunk;
+    if (onChunk) onChunk(fullText);
+  }
+}

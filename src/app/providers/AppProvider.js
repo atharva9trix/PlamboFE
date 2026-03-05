@@ -66,6 +66,11 @@ export function AppProvider({ children }) {
     }
   };
 
+  const goHome = (navigate) => { 
+  setActiveMode(null);
+  setMessages([]);
+  if (navigate) navigate("/"); 
+  };
   
   useEffect(() => {
     if (!user) return;
@@ -253,37 +258,61 @@ export function AppProvider({ children }) {
     return msg.id;
   };
 
-  const sendQuery = async (client, query) => {
-    if (!client || !query.trim()) return;
-
-    setLoading(true);
-    addMessage("user", query);
-
-    try {
-      const res = await appService.sendQuery(client, query, {});
-      const aiMessage =
-        typeof res === "string" ? res : res?.answer || "No response";
-
-      addMessage("ai", aiMessage);
-
-      if (currentChatSession && currentChatSession.title === "New Chat") {
-        const newTitle =
-          query.length > 30 ? query.substring(0, 30) + "..." : query;
-
-        setChatSessions((prev) =>
-          prev.map((s) =>
-            s.id === currentChatSession.id ? { ...s, title: newTitle } : s,
-          ),
-        );
-      }
-    } catch (err) {
-      addMessage("ai", err.response?.data?.message || "API Error");
-    } finally {
-      setLoading(false);
-    }
+ const formatContent = (text) => {
+    if (!text) return "";
+    return text
+      .replace(/\*\*/g, "")
+      .replace(/^\s*[\*•-]\s+/gm, "• ");
   };
 
+ const sendQuery = async (client, query) => {
+  if (!client || !query.trim()) return;
+
+  setLoading(true);
+  addMessage("user", query);
+
+  const aiMsgId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  setMessages(prev => [...prev, { 
+    id: aiMsgId, 
+    role: "ai", 
+    content: "", 
+    displayContent: "" 
+  }]);
+
+  let fullResponseText = "";
+  let displayedText = "";
+
+  try {
+    await appService.streamQuery(client.Client_Name, query, {}, async (partial) => {
+      fullResponseText = formatContent(partial || "");
+    });
+
+     const interval = setInterval(() => {
+      if (displayedText.length < fullResponseText.length) {
+       
+        displayedText = fullResponseText.slice(0, displayedText.length + 2);
+        
+        setMessages(prev => prev.map(msg => 
+          msg.id === aiMsgId ? { ...msg, displayContent: displayedText } : msg
+        ));
+      } else if (!loading) {
+       
+        clearInterval(interval);
+      }
+    }, 15); 
+
+   } catch (err) {
+    setMessages(prev => prev.map(msg => 
+      msg.id === aiMsgId ? { ...msg, displayContent: `Error: ${err.message}` } : msg
+    ));
+  } finally {
+    setLoading(false);
+  }
+ };
+
   const value = {
+    goHome,
     clients,
     selectedClient,
     setSelectedClient: selectClient,
