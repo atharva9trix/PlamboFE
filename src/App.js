@@ -1,8 +1,10 @@
-import MainLayout from "./layout/MainLayout";
+import React from "react";
 import { BrowserRouter, useLocation } from "react-router-dom";
-import AppRoutes from "./app/routes";
 import { ThemeProvider } from "@mui/material";
 import theme from "./ui/theme/theme";
+import MainLayout from "./layout/MainLayout";
+import AppRoutes from "./app/routes";
+import { AppProvider } from "./app/providers/AppProvider";
 
 function AppContent() {
   const location = useLocation();
@@ -23,9 +25,11 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <AppProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AppProvider>
   );
 }
 

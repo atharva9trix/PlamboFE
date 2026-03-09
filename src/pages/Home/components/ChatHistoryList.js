@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, IconButton, Divider } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useApp } from "../../../app/providers/AppProvider";
+import { useApp } from "../../../app/context/useApp";
 
 export default function ChatHistoryList() {
   const {

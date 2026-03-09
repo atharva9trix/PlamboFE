@@ -12,12 +12,13 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedUser = localStorage.getItem(PREFIX + "authUser");
+
     if (!storedUser) return;
 
     try {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-    } catch (error) {
+    } catch {
       localStorage.removeItem(PREFIX + "authUser");
       setUser(null);
     }
@@ -25,7 +26,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (username, password) => {
     const foundUser = DUMMY_USERS.find(
-      (u) => u.username === username && u.password === password,
+      (u) => u.username === username && u.password === password
     );
 
     if (foundUser) {
@@ -33,13 +34,20 @@ export const AuthProvider = ({ children }) => {
       setUser(foundUser);
       return true;
     }
+
     return false;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem(PREFIX + "authUser");
-    localStorage.removeItem(PREFIX + "selectedClient");
+
+  
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith(PREFIX)) {
+        localStorage.removeItem(key);
+      }
+    });
+    sessionStorage.clear();
   };
 
   return (

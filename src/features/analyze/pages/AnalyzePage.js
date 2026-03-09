@@ -9,7 +9,7 @@ import {
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApp } from "../../../app/providers/AppProvider";
+import { useApp } from "../../../app/context/useApp";
 import { useAuth } from "../../../app/context/AuthContext";
 import {
   fetchSchema,
