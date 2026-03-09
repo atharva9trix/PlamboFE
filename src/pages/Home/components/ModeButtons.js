@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useApp } from "../../../app/providers/AppProvider";
+import { useApp } from "../../../app/context/useApp";
 import AppAlert from "../../../ui/components/AppAlert";
 import { createSession } from "../../../core/services/appService";
 
@@ -127,8 +127,6 @@ export default function ModeButtons({ hideBrief = false }) {
                 cursor: "pointer",
                 backdropFilter: "blur(6px)",
                 transition: "all 0.2s ease",
-
-                
                 background: isActive
                   ? "linear-gradient(135deg, #ffffff, #d3d3d3)"
                   : "linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.1))",

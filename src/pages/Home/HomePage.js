@@ -1,7 +1,7 @@
 import { Box, Typography, Drawer, MenuItem, Select } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useApp } from "../../app/providers/AppProvider";
+import { useApp } from "../../app/context/useApp";
 import Background from "../../ui/components/Background";
 import ChatHistory from "./components/ChatHistory";
 import ChatHistoryList from "./components/ChatHistoryList";
@@ -125,7 +125,6 @@ export default function HomePage() {
             </Box>
           </>
         )}
-
       </Box>
 
       <AppAlert

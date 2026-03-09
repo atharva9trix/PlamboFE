@@ -13,10 +13,10 @@ export default function Footer() {
   const handleProfileClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
   const handleLogout = () => {
-    handleClose();
-    logout();
-    navigate("/login");
-  };
+  handleClose();
+  logout();
+  navigate("/login");
+ };
 
   const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";
 

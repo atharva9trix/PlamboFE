@@ -3,7 +3,7 @@ import { Box, Typography, Divider, Button } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppDropdown from "../../ui/components/AppDropdown";
 import logo from "../../assets/logo.png";
-import { useApp } from "../../app/providers/AppProvider";
+import { useApp } from "../../app/context/useApp";
 import ChatHistoryList from "../../pages/Home/components/ChatHistoryList";
 import AppAlert from "../../ui/components/AppAlert";
 import CreateEntityModal from "../../ui/components/EntityModal";
@@ -17,8 +17,10 @@ export default function Header() {
     projects = [],
     createClient,
     createProject,
-    loading,
+    isGenerating,
     showAlert,
+    createNewChat,
+    setMessages,
   } = useApp();
 
   const location = useLocation();
@@ -40,14 +42,21 @@ export default function Header() {
       : null;
 
   const handleClientChange = async (client) => {
-    if (loading) {
+    if (isGenerating) {
       showAlert(
         "Please Wait",
         "Wait while the response is generating before switching clients."
       );
       return;
     }
+
+    const previousClient = selectedClient;
+
     await setSelectedClient(client);
+
+    if (previousClient && previousClient.Id !== client.Id) {
+      createNewChat(client);
+    }
     navigate("/", { replace: true });
   };
 
@@ -56,7 +65,7 @@ export default function Header() {
     : null;
 
   const handleProjectClick = (project) => {
-    if (!loading) navigate(`/project/${project.Id}`);
+    if (!isGenerating) navigate(`/project/${project.Id}`);
   };
 
   const handleCreateClient = async (name) => {
@@ -78,24 +87,24 @@ export default function Header() {
             flexDirection: "column",
             alignItems: "flex-start",
             gap: 2,
+            pointerEvents: isGenerating ? "none" : "auto",
+            opacity: isGenerating ? 0.7 : 1,
           }}
         >
-    
           <Box
             sx={{
               mt: -1,
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
-              cursor: "pointer",
+              cursor: isGenerating ? "not-allowed" : "pointer",
               transition: "0.2s ease",
-              "&:hover": {
-                opacity: 0.85,
-              },
+              "&:hover": { opacity: 0.85 },
             }}
-          onClick={() => goHome(navigate)}
+            onClick={() => !isGenerating && goHome(navigate, setMessages)}
           >
             <img src={logo} alt="logo" width="74" />
+
             <Typography
               sx={{
                 mt: -2,
@@ -113,16 +122,18 @@ export default function Header() {
             </Typography>
           </Box>
 
+        
           <Box sx={{ width: "100%" }}>
             <AppDropdown
               options={clients}
               value={safeClient}
               onChange={handleClientChange}
-              disabled={loading}
+              disabled={isGenerating}
             />
+
             <Button
               onClick={() => setClientModalOpen(true)}
-              disabled={loading}
+              disabled={isGenerating}
               sx={{
                 p: 0,
                 minWidth: 0,
@@ -131,12 +142,7 @@ export default function Header() {
                 fontSize: 13,
                 fontWeight: 400,
                 color: "#fff",
-                "&.Mui-disabled": {
-                  color: "#fff",
-                  opacity: 0.4,
-                  cursor: "not-allowed",
-                },
-                "&:hover": { background: "transparent" },
+                cursor: isGenerating ? "not-allowed" : "pointer",
               }}
             >
               + new client
@@ -159,28 +165,18 @@ export default function Header() {
 
               {projects.map((project) => {
                 const isActive = String(project.Id) === String(activeProjectId);
+
                 return (
                   <Typography
                     key={project.Id}
                     onClick={() => handleProjectClick(project)}
                     sx={{
                       fontSize: 13,
-                      fontWeight: 400,
                       py: 0.6,
-                      cursor: loading ? "not-allowed" : "pointer",
-                      transition: "all 0.2s ease",
-                      color: isActive ? "#fff" : "rgba(234,231,226,0.85)",
-                      background: isActive
-                        ? "rgba(255,255,255,0.08)"
-                        : "transparent",
-                      borderRadius: 1,
-                      px: 1,
-                      opacity: loading ? 0.5 : 1,
-                      pointerEvents: loading ? "none" : "auto",
-                      "&:hover": {
-                        color: "#fff",
-                        background: "rgba(255,255,255,0.05)",
-                      },
+                      cursor: isGenerating ? "not-allowed" : "pointer",
+                      color: isActive
+                        ? "#fff"
+                        : "rgba(234,231,226,0.85)",
                     }}
                   >
                     {project.Project_Name}
@@ -190,28 +186,26 @@ export default function Header() {
 
               <Button
                 onClick={() => setProjectModalOpen(true)}
-                disabled={loading}
+                disabled={isGenerating}
                 sx={{
                   p: 0,
                   minWidth: 0,
                   mt: 1,
                   textTransform: "none",
                   fontSize: 13,
-                  fontWeight: 400,
                   color: "#fff",
-                  "&.Mui-disabled": {
-                    color: "#fff",
-                    opacity: 0.4,
-                    cursor: "not-allowed",
-                  },
-                  "&:hover": { background: "transparent" },
+                  cursor: isGenerating ? "not-allowed" : "pointer",
                 }}
               >
                 + new project
               </Button>
 
               <Divider
-                sx={{ mt: 2, mb: 1, borderColor: "rgba(255,255,255,0.15)" }}
+                sx={{
+                  mt: 2,
+                  mb: 1,
+                  borderColor: "rgba(255,255,255,0.15)",
+                }}
               />
             </Box>
           )}
@@ -231,8 +225,8 @@ export default function Header() {
                   width: "100%",
                   maxHeight: 280,
                   overflowY: "auto",
-                  opacity: loading ? 0.5 : 1,
-                  pointerEvents: loading ? "none" : "auto",
+                  opacity: isGenerating ? 0.5 : 1,
+                  pointerEvents: isGenerating ? "none" : "auto",
                 }}
               >
                 <ChatHistoryList inline />
@@ -247,7 +241,7 @@ export default function Header() {
         title="Create New Client"
         placeholder="Enter client name"
         onSubmit={handleCreateClient}
-        loading={loading}
+        isGenerating={isGenerating}
       />
 
       <CreateEntityModal
@@ -256,7 +250,7 @@ export default function Header() {
         title="Create New Project"
         placeholder="Enter project name"
         onSubmit={handleCreateProject}
-        loading={loading}
+        isGenerating={isGenerating}
       />
 
       <AppAlert

@@ -248,27 +248,29 @@ export async function createProject(SelectedClient, name) {
   }
 }
 
-export async function generateImage(clientId, prompt) {
+
+export async function generateMedia(clientId, prompt, mediaType = "image") {
   if (!clientId) throw new Error("clientId is required");
   if (!prompt) throw new Error("prompt is required");
 
   const payload = {
     client_id: clientId,
     prompt: prompt.trim(),
+    ...(mediaType === "video" ? { media_type: "video" } : {}),
   };
 
   try {
     const res = await axios.post(ENDPOINTS.GENERATE, payload, {
-      responseType: "blob", 
+      responseType: "blob",
     });
 
-    return res.data; 
+    return res.data;
   } catch (err) {
     const message =
       err?.response?.data?.message ||
       err?.response?.data?.detail ||
       err.message ||
-      "Failed to generate image";
+      "Failed to generate media";
 
     throw new Error(message);
   }

@@ -2,11 +2,11 @@ import { Box, TextField, CircularProgress, IconButton } from "@mui/material";
 import { useState } from "react";
 import MicNoneIcon from "@mui/icons-material/MicNone";
 import SendIcon from "@mui/icons-material/Send";
-import { useApp } from "../../../app/providers/AppProvider";
+import { useApp } from "../../../app/context/useApp";
 
 export default function QueryInput() {
   const [input, setInput] = useState("");
-  const { selectedClient, sendQuery, loading } = useApp();
+  const { selectedClient, sendQuery, isGenerating } = useApp();
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -46,7 +46,7 @@ export default function QueryInput() {
           multiline
           variant="standard"
           value={input}
-          disabled={!selectedClient || loading}
+          disabled={!selectedClient || isGenerating}
           placeholder={
             selectedClient ? "Type your message..." : "Select a client first"
           }
@@ -81,7 +81,7 @@ export default function QueryInput() {
 
         <IconButton
           onClick={handleSend}
-          disabled={!input.trim() || loading}
+          disabled={!input.trim() || isGenerating}
           sx={{
             color: "white",
             px: 2,
@@ -89,7 +89,7 @@ export default function QueryInput() {
             "&.Mui-disabled": { color: "rgba(255,255,255,0.3)" },
           }}
         >
-          {loading ? (
+          {isGenerating ? (
             <CircularProgress
               size={20}
               sx={{ color: "white", "& .MuiCircularProgress-svg": { stroke: "white !important" } }}
