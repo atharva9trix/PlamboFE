@@ -1,10 +1,18 @@
 import React, { useState } from "react";
-import { Box, Avatar, Typography, Menu, MenuItem, Divider, Fade } from "@mui/material";
-import { useAuth } from "../../app/context/AuthContext"; 
+import {
+  Box,
+  Avatar,
+  Typography,
+  Menu,
+  MenuItem,
+  Divider,
+  Fade,
+} from "@mui/material";
+import { useAuth } from "../../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Footer() {
-  const { user, logout } = useAuth(); 
+  const { userInfo, logout } = useAuth();
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -13,12 +21,14 @@ export default function Footer() {
   const handleProfileClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
   const handleLogout = () => {
-  handleClose();
-  logout();
-  navigate("/login");
- };
+    handleClose();
+    logout();
+    navigate("/login");
+  };
 
-  const userInitial = user?.username ? user.username.charAt(0).toUpperCase() : "U";
+  const userInitial = userInfo?.username
+    ? userInfo.username.charAt(0).toUpperCase()
+    : "U";
 
   return (
     <Box
@@ -72,7 +82,7 @@ export default function Footer() {
             letterSpacing: 0.5,
           }}
         >
-          {user?.username || "User"}
+          {userInfo?.username || "User"}
         </Typography>
       </Box>
 
@@ -98,10 +108,18 @@ export default function Footer() {
           },
         }}
       >
-        <Box sx={{ px: 2, py: 1, textAlign: "center", opacity: 0.85, fontSize: "13px" }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1,
+            textAlign: "center",
+            opacity: 0.85,
+            fontSize: "13px",
+          }}
+        >
           Signed in as
           <Typography sx={{ fontWeight: 600, fontSize: "14px", mt: 0.5 }}>
-            {user?.username}
+            {userInfo?.username}
           </Typography>
         </Box>
 

@@ -248,7 +248,6 @@ export async function createProject(SelectedClient, name) {
   }
 }
 
-
 export async function generateMedia(clientId, prompt, mediaType = "image") {
   if (!clientId) throw new Error("clientId is required");
   if (!prompt) throw new Error("prompt is required");
@@ -256,26 +255,32 @@ export async function generateMedia(clientId, prompt, mediaType = "image") {
   const payload = {
     client_id: clientId,
     prompt: prompt.trim(),
-    ...(mediaType === "video" ? { media_type: "video" } : {}),
+    media_type: mediaType,
   };
 
   try {
-    const res = await axios.post(ENDPOINTS.GENERATE, payload, {
-      responseType: "blob",
-    });
+    const res = await axios.post(
+      ENDPOINTS.GENERATE,
+      payload,
+      mediaType === "content"
+        ? {}
+        : { responseType: "blob" }
+    );
 
-    return res.data;
+    if (mediaType === "content") {
+      return res.data; 
+    }
+
+    return res.data; 
   } catch (err) {
     const message =
-      err?.response?.data?.message ||
+     "Failed to generate..."|| err?.response?.data?.message ||
       err?.response?.data?.detail ||
-      err.message ||
-      "Failed to generate media";
+      err.message;
 
     throw new Error(message);
   }
 }
-
 
 export async function streamQuery(clientId, query, opts = {}, onChunk) {
   const payload = {

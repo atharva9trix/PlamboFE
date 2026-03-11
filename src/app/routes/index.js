@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "../../pages/Home/HomePage";
 import LoginPage from "../../pages/Login/LoginPage";
+import SignupPage from "../../pages/Signup/SignupPage";
 import AuthGuard from "../context/AuthGuard";
 
 import analyzeRoutes from "../../features/analyze/analyze.routes";
@@ -24,7 +25,9 @@ export default function AppRoutes() {
     <Routes>
     
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
 
+     
       <Route
         path="/"
         element={
@@ -38,7 +41,11 @@ export default function AppRoutes() {
         <Route
           key={i}
           path={route.path}
-          element={<AuthGuard>{route.element}</AuthGuard>}
+          element={
+            <AuthGuard>
+              {route.element}
+            </AuthGuard>
+          }
         />
       ))}
 

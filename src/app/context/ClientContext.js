@@ -13,7 +13,7 @@ export function useClient() {
 }
 
 export function ClientProvider({ children }) {
-  const { user } = useAuth();
+  const { userInfo } = useAuth();
   const { showAlert } = useAlert();
   const { setActiveMode } = useAppState();
   const [clients, setClients] = useState([]);
@@ -40,7 +40,7 @@ export function ClientProvider({ children }) {
         JSON.stringify({
           clientId: clientObj.Id,
           timestamp: Date.now(),
-        })
+        }),
       );
     }
 
@@ -90,7 +90,7 @@ export function ClientProvider({ children }) {
       await appService.createProject(selectedClient.Client_Name, name);
 
       const updated = await appService.fetchProjects(
-        selectedClient.Client_Name
+        selectedClient.Client_Name,
       );
 
       setProjects(updated || []);
@@ -101,9 +101,8 @@ export function ClientProvider({ children }) {
     }
   };
 
-
   useEffect(() => {
-    if (!user) {
+    if (!userInfo) {
       setClients([]);
       setSelectedClientState(null);
       setProjects([]);
@@ -121,11 +120,10 @@ export function ClientProvider({ children }) {
     };
 
     loadClients();
-  }, [user]);
+  }, [userInfo]);
 
- 
   useEffect(() => {
-    if (!user) return;
+    if (!userInfo) return;
     if (!clients.length) return;
 
     const stored = localStorage.getItem(PREFIX + "selectedClient");
@@ -138,9 +136,7 @@ export function ClientProvider({ children }) {
     try {
       const { clientId } = JSON.parse(stored);
 
-      const found = clients.find(
-        (c) => String(c.Id) === String(clientId)
-      );
+      const found = clients.find((c) => String(c.Id) === String(clientId));
 
       if (found) {
         selectClient(found, false);
@@ -152,7 +148,7 @@ export function ClientProvider({ children }) {
       localStorage.removeItem(PREFIX + "selectedClient");
       redirectToHomepage();
     }
-  }, [clients, user]);
+  }, [clients, userInfo]);
 
   return (
     <ClientContext.Provider
