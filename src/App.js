@@ -8,7 +8,8 @@ import { AppProvider } from "./app/providers/AppProvider";
 
 function AppContent() {
   const location = useLocation();
-  const isUnprotectedRoute = location.pathname === "/login";
+  const isUnprotectedRoute =
+    location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <ThemeProvider theme={theme}>

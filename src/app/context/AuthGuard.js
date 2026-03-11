@@ -1,22 +1,47 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const AuthGuard = ({ children }) => {
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const { userInfo: user, loading: authLoading } = useAuth();
+  const location = useLocation();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-  
-    const timer = setTimeout(() => setIsLoading(false), 100);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!authLoading) {
+      setIsInitialized(true);
+    }
+  }, [authLoading]);
 
-  if (isLoading) {
-    return <div>Loading...</div>; 
+  if (!isInitialized || authLoading) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '100vh',
+          bgcolor: '#000'
+        }}
+      >
+        <CircularProgress sx={{ color: '#21cbf3' }} />
+      </Box>
+    );
   }
 
-  return user ? children : <Navigate to="/login" />;
+  if (!user) {
+    return (
+      <Navigate 
+        to="/login" 
+        state={{ from: location.pathname }} 
+        replace 
+      />
+    );
+  }
+
+  return children;
 };
 
 export default AuthGuard;

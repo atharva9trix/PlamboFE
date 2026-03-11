@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import logo from "../../../assets/logo.png";
 
-export default function LoginHeader() {
+export default function SignupHeader() {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -10,7 +10,7 @@ export default function LoginHeader() {
       transition={{ duration: 0.7, ease: "easeOut" }}
     >
       <Box textAlign="center" sx={{ px: 2 }}>
-     
+       
         <motion.img
           src={logo}
           alt="Logo"
@@ -30,7 +30,7 @@ export default function LoginHeader() {
       
         <Typography
           sx={{
-            fontSize: "1.5rem",
+            fontSize: "1.5rem", 
             fontWeight: 800,
             lineHeight: 1.2,
             letterSpacing: "-0.02em",
@@ -43,7 +43,7 @@ export default function LoginHeader() {
           Performance Branding Platform
         </Typography>
 
-      
+    
         <Typography
           sx={{
             color: "rgba(255,255,255,0.5)",
@@ -54,7 +54,7 @@ export default function LoginHeader() {
             margin: "0 auto",
           }}
         >
-          Precision insights and tools designed for modern marketing teams.
+          Build powerful brand experiences and scale your digital presence.
         </Typography>
       </Box>
     </motion.div>

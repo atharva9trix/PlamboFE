@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { validateLogin } from "../utils/loginValidation";
 import { useAuth } from "../../../app/context/AuthContext";
 
@@ -7,12 +7,14 @@ export function useLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const location = useLocation();
+  const { login, loading: authLoading } = useAuth();
 
-  const handleLogin = async ({ username, password }) => {
+  const from = location.state?.from?.pathname || "/";
+
+  const handleLogin = async ({ email, password }) => {
     setError("");
-
-    const validationError = validateLogin(username, password);
+    const validationError = validateLogin(email, password);
     if (validationError) {
       setError(validationError);
       return;
@@ -20,19 +22,24 @@ export function useLogin() {
 
     try {
       setLoading(true);
-      const success = login(username, password);
+      const result = await login(email, password);
 
-      if (success) {
-        navigate("/", { replace: true }); 
+      if (result.success) {
+        
+        navigate("/", { replace: true });
       } else {
-        setError("Invalid username or password.");
+        setError(result.error);
       }
-    } catch {
+    } catch (error) {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  return { handleLogin, error, loading };
+  return {
+    handleLogin,
+    error,
+    loading: loading || authLoading,
+  };
 }
