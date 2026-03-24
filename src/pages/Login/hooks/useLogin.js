@@ -27,6 +27,7 @@ export function useLogin() {
       if (result.success) {
         
         navigate("/", { replace: true });
+        window.location.reload();
       } else {
         setError(result.error);
       }

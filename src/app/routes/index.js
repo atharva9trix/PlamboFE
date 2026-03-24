@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "../../pages/Home/HomePage";
 import LoginPage from "../../pages/Login/LoginPage";
 import SignupPage from "../../pages/Signup/SignupPage";
+import ForgotPasswordEmail from "../../pages/ForgetResetPassword/pages/ForgotPasswordEmail";
+import ResetPassword from "../../pages/ForgetResetPassword/pages/ResetPassword";
 import AuthGuard from "../context/AuthGuard";
 
 import analyzeRoutes from "../../features/analyze/analyze.routes";
@@ -10,6 +12,8 @@ import generateRoutes from "../../features/generate/generate.routes";
 import audienceRoutes from "../../features/audience/audience.routes";
 import activateRoutes from "../../features/activate/activate.routes";
 import projectRoutes from "../../features/project/project.route";
+import profileRoutes from "../../pages/Profile/profile.route";
+import usersRoutes from "../../pages/Users/users.route";
 
 export default function AppRoutes() {
   const dynamicRoutes = [
@@ -19,15 +23,17 @@ export default function AppRoutes() {
     ...audienceRoutes,
     ...activateRoutes,
     ...projectRoutes,
+    ...profileRoutes,
+    ...usersRoutes,
   ];
 
   return (
     <Routes>
-    
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordEmail />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
-     
       <Route
         path="/"
         element={
@@ -41,11 +47,7 @@ export default function AppRoutes() {
         <Route
           key={i}
           path={route.path}
-          element={
-            <AuthGuard>
-              {route.element}
-            </AuthGuard>
-          }
+          element={<AuthGuard>{route.element}</AuthGuard>}
         />
       ))}
 
