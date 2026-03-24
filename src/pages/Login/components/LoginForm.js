@@ -7,6 +7,7 @@ import {
   InputAdornment,
   IconButton,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { Visibility, VisibilityOff, Email } from "@mui/icons-material";
 import { useState } from "react";
@@ -50,27 +51,23 @@ export default function LoginForm({
   };
 
   const handleEmailChange = (e) => {
-    const value = e.target.value;
-    setEmail(value);
+    setEmail(e.target.value);
     if (localErrors.email) {
       setLocalErrors((prev) => ({ ...prev, email: "" }));
     }
   };
 
   const handlePasswordChange = (e) => {
-    const value = e.target.value;
-    setPassword(value);
+    setPassword(e.target.value);
     if (localErrors.password) {
       setLocalErrors((prev) => ({ ...prev, password: "" }));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!validate()) return;
-
-   
     onSubmit({ email, password });
   };
 
@@ -88,7 +85,7 @@ export default function LoginForm({
         Welcome Back
       </Typography>
 
-      
+
       <TextField
         fullWidth
         label="Email Address"
@@ -98,7 +95,7 @@ export default function LoginForm({
         onChange={handleEmailChange}
         error={!!localErrors.email}
         helperText={localErrors.email}
-        sx={inputStyles}
+        sx={{ ...inputStyles, mb: 2 }}
         InputProps={{
           disableUnderline: true,
           startAdornment: (
@@ -107,10 +104,9 @@ export default function LoginForm({
             </InputAdornment>
           ),
         }}
-        mb={1.5}
       />
 
-    
+     
       <TextField
         fullWidth
         label="Password"
@@ -120,7 +116,7 @@ export default function LoginForm({
         onChange={handlePasswordChange}
         error={!!localErrors.password}
         helperText={localErrors.password}
-        sx={inputStyles}
+        sx={{ ...inputStyles, mb: 1 }}
         InputProps={{
           disableUnderline: true,
           endAdornment: (
@@ -135,10 +131,35 @@ export default function LoginForm({
             </InputAdornment>
           ),
         }}
-        mb={2}
       />
 
-  
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          mb: 2,
+        }}
+      >
+        <Button
+          component={Link}
+          to="/forgot-password"
+          sx={{
+            color: "#21cbf3",
+            fontSize: "0.85rem",
+            textTransform: "none",
+            p: 0,
+            minWidth: "auto",
+            "&:hover": {
+              background: "transparent",
+              textDecoration: "underline",
+            },
+          }}
+        >
+          Forgot Password?
+        </Button>
+      </Box>
+
+    
       {(generalError || propError) && (
         <Alert
           severity="error"
@@ -153,58 +174,61 @@ export default function LoginForm({
         </Alert>
       )}
 
-      
+     
       <Button
         type="submit"
         fullWidth
         size="large"
         disabled={propLoading}
         sx={{
-          py: 2,
+          py: 1.7,
           borderRadius: "14px",
           fontWeight: 700,
           textTransform: "none",
-          fontSize: "1.1rem",
+          fontSize: "1rem",
           background: "linear-gradient(135deg, #2196f3 0%, #21cbf3 100%)",
           boxShadow: "0 8px 20px rgba(33,150,243,0.3)",
           transition: "all 0.3s ease",
           "&:hover": {
             transform: "translateY(-2px)",
             boxShadow: "0 12px 25px rgba(33,150,243,0.5)",
-            background: "linear-gradient(135deg, #21cbf3 0%, #21d4f8 100%)",
           },
           "&:disabled": {
             background: "rgba(33,150,243,0.6)",
-            transform: "none",
           },
         }}
       >
-        {propLoading ? "Signing In..." : "Sign In"}
+        {propLoading ? (
+          <CircularProgress size={24} color="inherit" />
+        ) : (
+          "Sign In"
+        )}
       </Button>
 
-     
-      <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.1)" }} />
+    
+      <Divider sx={{ my: 2.5, borderColor: "rgba(255,255,255,0.1)" }} />
 
-      <Box sx={{ textAlign: "center" }}>
+     
+      <Box sx={{ textAlign: "center", mt:5 }}>
         <Typography
           variant="body2"
-          sx={{ color: "rgba(255,255,255,0.6)", mb: 1 }}
+          sx={{ color: "rgba(255,255,255,0.6)", mb: 0.5 }}
         >
           Don't have an account?
         </Typography>
+
         <Button
           component={Link}
-          to ="/signup"
+          to="/signup"
           sx={{
             color: "#21cbf3",
-            fontWeight: 500,
+            fontWeight: 200,
             textTransform: "none",
-            fontSize: "1rem",
+            fontSize: "0.95rem",
             p: 1,
             "&:hover": {
               bgcolor: "rgba(33,203,243,0.1)",
-              borderRadius: "14px",
-              transform: "translateY(-1px)",
+              borderRadius: "10px",
             },
           }}
         >

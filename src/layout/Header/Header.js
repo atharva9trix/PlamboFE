@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Divider, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  Button,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppDropdown from "../../ui/components/AppDropdown";
 import logo from "../../assets/logo.png";
@@ -7,6 +15,8 @@ import { useApp } from "../../app/context/useApp";
 import ChatHistoryList from "../../pages/Home/components/ChatHistoryList";
 import AppAlert from "../../ui/components/AppAlert";
 import CreateEntityModal from "../../ui/components/EntityModal";
+import { uploadKnowledgeBase } from "../../core/services/appService";
+import UploadKnowledgeBaseModal from "./components/UploadKBModal";
 
 export default function Header() {
   const {
@@ -30,6 +40,9 @@ export default function Header() {
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [projectModalOpen, setProjectModalOpen] = useState(false);
 
+  const [kbUploading, setKbUploading] = useState(false);
+  const [kbModalOpen, setKbModalOpen] = useState(false);
+
   useEffect(() => {
     if (selectedClient && !clients.find((c) => c.Id === selectedClient.Id)) {
       setSelectedClient(null);
@@ -45,7 +58,7 @@ export default function Header() {
     if (isGenerating) {
       showAlert(
         "Please Wait",
-        "Wait while the response is generating before switching clients."
+        "Wait while the response is generating before switching clients.",
       );
       return;
     }
@@ -68,25 +81,27 @@ export default function Header() {
     if (!isGenerating) navigate(`/project/${project.Id}`);
   };
 
-  const handleCreateClient = async (name) => {
-    await createClient(name);
-  };
-
-  const handleCreateProject = async (name) => {
-    await createProject(name);
-  };
-
   return (
     <>
-      <Box sx={{ px: 3 }}>
+      <Box
+        sx={{
+          px: 2,
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <Box
           sx={{
             width: "100%",
-            maxWidth: 240,
+            maxWidth: 200,
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",
             gap: 2,
+            height: "100%",
+            overflow: "hidden",
+            minHeight: 0,
             pointerEvents: isGenerating ? "none" : "auto",
             opacity: isGenerating ? 0.7 : 1,
           }}
@@ -96,10 +111,7 @@ export default function Header() {
               mt: -1,
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
               cursor: isGenerating ? "not-allowed" : "pointer",
-              transition: "0.2s ease",
-              "&:hover": { opacity: 0.85 },
             }}
             onClick={() => !isGenerating && goHome(navigate, setMessages)}
           >
@@ -111,9 +123,7 @@ export default function Header() {
                 mb: 1,
                 fontSize: 22,
                 fontWeight: 500,
-                lineHeight: 1.15,
                 color: "#fff",
-                userSelect: "none",
               }}
             >
               Performance
@@ -122,27 +132,42 @@ export default function Header() {
             </Typography>
           </Box>
 
-        
-          <Box sx={{ width: "100%" }}>
-            <AppDropdown
-              options={clients}
-              value={safeClient}
-              onChange={handleClientChange}
-              disabled={isGenerating}
-            />
+          <Box sx={{ width: "100%", flexShrink: 0 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <AppDropdown
+                options={clients}
+                value={safeClient}
+                onChange={handleClientChange}
+                disabled={isGenerating}
+              />
+
+              {safeClient && (
+                <Tooltip title="Upload Knowledge Base">
+                  <IconButton
+                    size="small"
+                    onClick={() => setKbModalOpen(true)}
+                    sx={{
+                      color: "#fff",
+                      background: "rgba(255,255,255,0.08)",
+                      "&:hover": {
+                        background: "rgba(255,255,255,0.18)",
+                      },
+                    }}
+                  >
+                    <UploadFileIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
 
             <Button
               onClick={() => setClientModalOpen(true)}
-              disabled={isGenerating}
               sx={{
                 p: 0,
-                minWidth: 0,
                 mt: 1,
                 textTransform: "none",
                 fontSize: 13,
-                fontWeight: 400,
                 color: "#fff",
-                cursor: isGenerating ? "not-allowed" : "pointer",
               }}
             >
               + new client
@@ -150,64 +175,69 @@ export default function Header() {
           </Box>
 
           {safeClient && (
-            <Box sx={{ width: "100%", mt: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  letterSpacing: "0.05em",
-                  textTransform: "capitalize",
-                  mb: 1,
-                  color: "rgba(234,231,226,0.45)",
-                }}
-              >
-                Projects
-              </Typography>
+            <>
+              <Box sx={{ width: "100%", flexShrink: 0 }}>
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    mb: 1,
+                    color: "rgba(234,231,226,0.45)",
+                  }}
+                >
+                  Projects
+                </Typography>
 
-              {projects.map((project) => {
-                const isActive = String(project.Id) === String(activeProjectId);
+                <Box
+                  sx={{
+                    maxHeight: "20vh",
+                    overflowY: "auto",
+                    pr: 1,
+                    minHeight: 0,
+                    "&::-webkit-scrollbar": {
+                      width: "4px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      background: "rgba(255,255,255,0.3)",
+                      borderRadius: "4px",
+                    },
+                  }}
+                >
+                  {projects.map((project) => {
+                    const isActive =
+                      String(project.Id) === String(activeProjectId);
 
-                return (
-                  <Typography
-                    key={project.Id}
-                    onClick={() => handleProjectClick(project)}
-                    sx={{
-                      fontSize: 13,
-                      py: 0.6,
-                      cursor: isGenerating ? "not-allowed" : "pointer",
-                      color: isActive
-                        ? "#fff"
-                        : "rgba(234,231,226,0.85)",
-                    }}
-                  >
-                    {project.Project_Name}
-                  </Typography>
-                );
-              })}
-
-              <Button
-                onClick={() => setProjectModalOpen(true)}
-                disabled={isGenerating}
-                sx={{
-                  p: 0,
-                  minWidth: 0,
-                  mt: 1,
-                  textTransform: "none",
-                  fontSize: 13,
-                  color: "#fff",
-                  cursor: isGenerating ? "not-allowed" : "pointer",
-                }}
-              >
-                + new project
-              </Button>
+                    return (
+                      <Typography
+                        key={project.Id}
+                        onClick={() => handleProjectClick(project)}
+                        sx={{
+                          fontSize: 13,
+                          lineHeight: 1.7,
+                          display: "block",
+                          py: 0.5,
+                          cursor: "pointer",
+                          wordBreak: "break-word",
+                          color: isActive ? "#fff" : "rgba(234,231,226,0.85)",
+                          "&:hover": {
+                            color: "#fff",
+                          },
+                        }}
+                      >
+                        {project.Project_Name}
+                      </Typography>
+                    );
+                  })}
+                </Box>
+              </Box>
 
               <Divider
                 sx={{
-                  mt: 2,
-                  mb: 1,
+                  mt: 0.5,
                   borderColor: "rgba(255,255,255,0.15)",
+                  flexShrink: 0,
                 }}
               />
-            </Box>
+            </>
           )}
 
           {safeClient &&
@@ -223,24 +253,44 @@ export default function Header() {
               <Box
                 sx={{
                   width: "100%",
-                  maxHeight: 280,
+                  flex: 1,
+                  minHeight: 0,
                   overflowY: "auto",
-                  opacity: isGenerating ? 0.5 : 1,
-                  pointerEvents: isGenerating ? "none" : "auto",
                 }}
               >
-                <ChatHistoryList inline />
+                <ChatHistoryList />
               </Box>
             )}
         </Box>
       </Box>
+
+      <UploadKnowledgeBaseModal
+        open={kbModalOpen}
+        onClose={() => setKbModalOpen(false)}
+        loading={kbUploading}
+        onUpload={async (file) => {
+          try {
+            setKbUploading(true);
+            const res = await uploadKnowledgeBase(file, safeClient.Client_Name);
+            showAlert(
+              "Success",
+              res.message || "Knowledge base uploaded successfully.",
+            );
+            setKbModalOpen(false);
+          } catch (error) {
+            showAlert("Error", error.message || "Upload failed.");
+          } finally {
+            setKbUploading(false);
+          }
+        }}
+      />
 
       <CreateEntityModal
         open={clientModalOpen}
         onClose={() => setClientModalOpen(false)}
         title="Create New Client"
         placeholder="Enter client name"
-        onSubmit={handleCreateClient}
+        onSubmit={(name) => createClient(name)}
         isGenerating={isGenerating}
       />
 
@@ -249,7 +299,7 @@ export default function Header() {
         onClose={() => setProjectModalOpen(false)}
         title="Create New Project"
         placeholder="Enter project name"
-        onSubmit={handleCreateProject}
+        onSubmit={(name) => createProject(name)}
         isGenerating={isGenerating}
       />
 

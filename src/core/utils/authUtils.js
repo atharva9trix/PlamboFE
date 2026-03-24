@@ -2,6 +2,7 @@ import { jwtDecode } from "jwt-decode";
 
 export const isTokenValid = (token) => {
   if (!token) return false;
+
   try {
     const decoded = jwtDecode(token);
     const currentTime = Date.now() / 1000;
@@ -11,7 +12,6 @@ export const isTokenValid = (token) => {
   }
 };
 
-
 export const getUserInfoFromToken = (token) => {
   if (!token || typeof token !== "string") return null;
 
@@ -20,8 +20,7 @@ export const getUserInfoFromToken = (token) => {
 
     if (!decoded || typeof decoded !== "object") return null;
 
-    const roles =
-      decoded?.resource_access?.[decoded?.azp]?.roles || [];
+    const roles = decoded?.resource_access?.plambo?.roles || [];
 
     const normalizedRoles = Array.isArray(roles)
       ? roles.map((r) => r?.toLowerCase?.()).filter(Boolean)
@@ -38,7 +37,6 @@ export const getUserInfoFromToken = (token) => {
         : normalizedRoles[0] || "user",
     };
   } catch (error) {
-  
     return null;
   }
 };

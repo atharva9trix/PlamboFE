@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-
 import { loginUser, signupUser } from "../../core/services/keycloakApi";
 import { getUserInfoFromToken, isTokenValid } from "../../core/utils/authUtils";
 
@@ -65,7 +64,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        error:  "Login failed" || error.response?.data?.message,
+        error: "Login failed" || error.response?.data?.message,
       };
     } finally {
       setLoading(false);
@@ -88,12 +87,13 @@ export const AuthProvider = ({ children }) => {
       return {
         success: true,
         message:
-          "Account created successfully. Please login." || response?.data?.message,
+          "Account created successfully. Please login." ||
+          response?.data?.message,
       };
     } catch (error) {
       return {
         success: false,
-        error:"User already exists" || error.response?.data?.message,
+        error: "User already exists" || error.response?.data?.message,
       };
     } finally {
       setLoading(false);

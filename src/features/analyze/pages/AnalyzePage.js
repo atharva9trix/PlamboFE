@@ -184,9 +184,6 @@ export default function AnalyzePage() {
     }
   };
 
-  const userInitial = user?.username
-    ? user.username.charAt(0).toUpperCase()
-    : "U";
 
   return (
     <Box
@@ -202,8 +199,8 @@ export default function AnalyzePage() {
       <Box
         sx={{
           width: 200,
-          p: 3,
-          pt: 55,
+          p: 2.7,
+          pt: 53,
           display: "flex",
           flexDirection: "column",
           background: "transparent",
@@ -261,7 +258,7 @@ export default function AnalyzePage() {
           sx={{
             flex: 1,
             pr: 4,
-            pl: 2,
+            pl: 3,
             mt: 2,
             display: "flex",
             flexDirection: "column",

@@ -15,6 +15,7 @@ const ENDPOINTS = {
   CREATE: "/create",
   GET: "/get",
   GENERATE: "/generate",
+  UPLOAD_KNOWLEDGEBASE: "/knowledgebase/data/upload/",
 };
 
 
@@ -307,5 +308,36 @@ export async function streamQuery(clientId, query, opts = {}, onChunk) {
     const chunk = decoder.decode(value, { stream: true });
     fullText += chunk;
     if (onChunk) onChunk(fullText);
+  }
+}
+
+export async function uploadKnowledgeBase(file, clientId) {
+  if (!file) throw new Error("File is required");
+  if (!clientId) throw new Error("clientId is required");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("client_id", clientId);
+
+  try {
+    const response = await axios.post(
+      ENDPOINTS.UPLOAD_KNOWLEDGEBASE,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.detail ||
+      error.message ||
+      "Failed to upload knowledge base";
+
+    throw new Error(message);
   }
 }
