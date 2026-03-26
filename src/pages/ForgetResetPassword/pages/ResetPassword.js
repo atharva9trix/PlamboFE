@@ -16,7 +16,7 @@ import SplitAuthLayout from "../../Login/layouts/SplitAuthLayout";
 import LoginHeader from "../../Login/components/LoginHeader";
 import { inputStyles } from "../../Login/styles/login.styles";
 
-import { resetUserPassword } from "../../../core/services/keycloakApi";
+import { resetPassword } from "../../../core/services/keycloakApi";
 import {
   REALM,
   CLIENT_NAME,
@@ -76,7 +76,7 @@ export default function ResetPasswordPage() {
         resetToken,
       };
 
-      await resetUserPassword(payload);
+      await resetPassword(payload);
 
       setSuccess(true);
 

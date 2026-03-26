@@ -156,3 +156,21 @@ export const forgotPassword = async (email) => {
     }
   );
 };
+
+export const resetPassword = async (payload) => {
+  const formData = new URLSearchParams();
+
+  Object.keys(payload).forEach((key) => {
+    formData.append(key, payload[key]);
+  });
+
+  return await UserInstance.post(
+    "/api/users/auth/forgot/resetPassword", 
+    formData,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+};
